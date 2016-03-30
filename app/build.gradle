@@ -4,19 +4,38 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
 
+    signingConfigs {
+        release {
+            storeFile file("../debug.keystore")
+            storePassword "testres"
+            keyAlias "testres"
+            keyPassword "testres"
+        }
+    }
+
     defaultConfig {
         applicationId "com.apkfuns.andfixdemo"
         minSdkVersion 9
         targetSdkVersion 23
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.release
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
+
 }
 
 dependencies {
@@ -29,4 +48,33 @@ dependencies {
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta4'
     compile 'io.reactivex:rxandroid:1.0.1'
     compile 'com.apkfuns.logutils:library:1.2.2'
+}
+
+task getApk(dependsOn: 'build') <<{
+    delete("$rootDir/apk")
+    copy {
+        from("$buildDir/outputs/apk/app-debug.apk") {
+            rename 'app-debug.apk', 'app-debug_v1.apk'
+        }
+        into new File(rootDir, 'apk')
+    }
+}
+
+task getPatch(dependsOn: 'build') << {
+    delete("$rootDir/apk/app-debug_v2.apk")
+    delete("$rootDir/patchs")
+    copy {
+        from("$buildDir/outputs/apk/app-debug.apk") {
+            rename 'app-debug.apk', 'app-debug_v2.apk'
+        }
+        into new File(rootDir, 'apk')
+    }
+    exec {
+        executable "$rootDir/start.sh"
+    }
+    copy {
+        from("$rootDir/patchs")
+        include '*.apatch'
+        into "$rootDir/apk"
+    }
 }

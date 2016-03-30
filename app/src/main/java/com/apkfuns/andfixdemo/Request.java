@@ -13,7 +13,7 @@ import rx.Observable;
  * Created by pengwei on 16/3/28.
  */
 public interface Request {
-    @GET("/getFixConfig1.json")
+    @GET("andfix/getFixConfig.json")
     Observable<FixConfigEntity> getFixConfig();
 
     @GET

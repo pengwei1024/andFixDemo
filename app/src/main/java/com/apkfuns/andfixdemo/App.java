@@ -5,6 +5,8 @@ import android.app.Application;
 import com.alipay.euler.andfix.patch.PatchManager;
 import com.apkfuns.logutils.LogUtils;
 
+import java.io.IOException;
+
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -15,12 +17,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class App extends Application {
 
     private PatchManager manager;
+    private static App instance;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
         initAndFix();
         logUtilsConfig();
+    }
+
+
+    public static App getInstance() {
+        return instance;
     }
 
     private void logUtilsConfig() {
@@ -29,6 +38,7 @@ public class App extends Application {
                 .configShowBorders(true)
                 .configTagPrefix("andFixDemo");
     }
+
 
     public static Request getRequest() {
         Retrofit retrofit = new Retrofit.Builder()
@@ -39,9 +49,22 @@ public class App extends Application {
         return retrofit.create(Request.class);
     }
 
+    public void addPatch(String patch) {
+        try {
+            manager.addPatch(patch);
+        } catch (IOException e) {
+            LogUtils.e(e);
+        }
+    }
+
     private void initAndFix() {
         manager = new PatchManager(this);
         manager.init(VersionHelper.getVersionName(this));
+//        try {
+//            manager.addPatch("/sdcard/tencent/QQfile_recv/new.apatch");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         manager.loadPatch();
     }
 }

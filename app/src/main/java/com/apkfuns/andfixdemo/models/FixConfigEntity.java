@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class FixConfigEntity implements Serializable {
     private String patchVersion;
     private String patchUrl;
+    private boolean needFix;
 
     public String getPatchVersion() {
         return patchVersion;
@@ -23,5 +24,13 @@ public class FixConfigEntity implements Serializable {
 
     public void setPatchUrl(String patchUrl) {
         this.patchUrl = patchUrl;
+    }
+
+    public boolean isNeedFix() {
+        return needFix;
+    }
+
+    public void setNeedFix(boolean needFix) {
+        this.needFix = needFix;
     }
 }
